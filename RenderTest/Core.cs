@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SharpDX.Windows;
 
 namespace RenderTest
 {
@@ -51,7 +52,10 @@ namespace RenderTest
 
 		private static void InitializeWindow(out int num1, out int num2)
 		{
-			
+			RenderForm = new RenderForm("RenderTest")
+			{
+
+			};
 		}
 
 		private static void ShutdownWindow()
