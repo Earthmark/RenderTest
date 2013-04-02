@@ -25,7 +25,10 @@ namespace RenderTest
 			get
 			{
 				bool var;
-				return keys.TryGetValue(key, out var) && var;
+				if(keys.TryGetValue(key, out var))
+					return var;
+				keys[key] = false;
+				return false;
 			}
 		}
 
