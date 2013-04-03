@@ -34,31 +34,31 @@
   <ItemGroup>
     <Reference Include="SharpDX, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libraries\SharpDX.dll</HintPath>
+      <HintPath>..\Lib\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.D3DCompiler, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libraries\SharpDX.D3DCompiler.dll</HintPath>
+      <HintPath>..\Lib\SharpDX.D3DCompiler.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct2D1, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libraries\SharpDX.Direct2D1.dll</HintPath>
+      <HintPath>..\Lib\SharpDX.Direct2D1.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D11, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libraries\SharpDX.Direct3D11.dll</HintPath>
+      <HintPath>..\Lib\SharpDX.Direct3D11.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D11.Effects, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libraries\SharpDX.Direct3D11.Effects.dll</HintPath>
+      <HintPath>..\Lib\SharpDX.Direct3D11.Effects.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.DXGI, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libraries\SharpDX.DXGI.dll</HintPath>
+      <HintPath>..\Lib\SharpDX.DXGI.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.RawInput, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Libraries\SharpDX.RawInput.dll</HintPath>
+      <HintPath>..\Lib\SharpDX.RawInput.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -73,31 +73,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core.cs" />
-    <Compile Include="Graphics.cs" />
-    <Compile Include="Input.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Drawing\D3D.cs" />
+    <Compile Include="Main\Core.cs" />
+    <Compile Include="Drawing\Graphics.cs" />
+    <Compile Include="Control\Input.cs" />
+    <Compile Include="Main\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Shaders\Color.fx" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Libraries\SharpDX.D3DCompiler.dll" />
-    <Content Include="Libraries\SharpDX.D3DCompiler.xml" />
-    <Content Include="Libraries\SharpDX.Direct2D1.dll" />
-    <Content Include="Libraries\SharpDX.Direct2D1.xml" />
-    <Content Include="Libraries\SharpDX.Direct3D11.dll" />
-    <Content Include="Libraries\SharpDX.Direct3D11.Effects.dll" />
-    <Content Include="Libraries\SharpDX.Direct3D11.Effects.xml" />
-    <Content Include="Libraries\SharpDX.Direct3D11.xml" />
-    <Content Include="Libraries\SharpDX.dll" />
-    <Content Include="Libraries\SharpDX.DXGI.dll" />
-    <Content Include="Libraries\SharpDX.DXGI.xml" />
-    <Content Include="Libraries\SharpDX.RawInput.dll" />
-    <Content Include="Libraries\SharpDX.RawInput.xml" />
-    <Content Include="Libraries\SharpDX.xml" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
