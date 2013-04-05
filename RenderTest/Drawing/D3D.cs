@@ -19,11 +19,11 @@ namespace RenderTest.Drawing
 		private DepthStencilView depthStencilView;
 		private RasterizerState rasterState;
 		private Adapter adapter;
-		private DeviceContext1 context;
 
 		public int VideoCardMemory { get; private set; }
 		public string VideoCardDescription { get; private set; }
 		public Device1 Device { get; private set; }
+		public DeviceContext1 Context { get; private set; }
 
 		public Matrix ProjectionMatrix { get; private set; }
 		public Matrix WorldMatrix { get; private set; }
@@ -69,7 +69,7 @@ namespace RenderTest.Drawing
 					}
 				}
 
-				context = Device.ImmediateContext1;
+				Context = Device.ImmediateContext1;
 
 				var backBuffer = Resource.FromSwapChain<Texture2D>(swapChain, 0);
 				renderTargetView = new RenderTargetView(Device, backBuffer);
@@ -119,7 +119,7 @@ namespace RenderTest.Drawing
 
 				depthStencilState = new DepthStencilState(Device, depthStencilDesc);
 
-				context.OutputMerger.SetDepthStencilState(depthStencilState, 1);
+				Context.OutputMerger.SetDepthStencilState(depthStencilState, 1);
 
 				var depthStencilViewDesc = new DepthStencilViewDescription
 				{
@@ -149,7 +149,7 @@ namespace RenderTest.Drawing
 
 				rasterState = new RasterizerState(Device, rasterDesc);
 
-				context.Rasterizer.SetViewport(0, 0, Core.Width, Core.Height);
+				Context.Rasterizer.SetViewport(0, 0, Core.Width, Core.Height);
 
 				ProjectionMatrix = Matrix.PerspectiveFovLH((float) (Math.PI / 4), ((float) Core.Width) / Core.Height, graphics.ScreenNear, graphics.ScreenDepth);
 				WorldMatrix = Matrix.Identity;
@@ -215,9 +215,9 @@ namespace RenderTest.Drawing
 
 		public void BeginScene(Color4 color)
 		{
-			context.ClearDepthStencilView(depthStencilView, DepthStencilClearFlags.Depth, 1, 0);
+			Context.ClearDepthStencilView(depthStencilView, DepthStencilClearFlags.Depth, 1, 0);
 
-			context.ClearRenderTargetView(renderTargetView, color);
+			Context.ClearRenderTargetView(renderTargetView, color);
 		}
 
 		public void EndScene()
