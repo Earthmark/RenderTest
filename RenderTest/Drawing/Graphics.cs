@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using RenderTest.Main;
 using SharpDX;
 
 namespace RenderTest.Drawing
@@ -8,6 +9,9 @@ namespace RenderTest.Drawing
 	{
 		private bool fullScreen;
 		private D3D directxDevice;
+		private Camera camera;
+		private Model model;
+		private ColorShader colorShader;
 
 		public bool FullScreen
 		{
@@ -39,6 +43,14 @@ namespace RenderTest.Drawing
 				return false;
 			}
 
+			camera = new Camera {Position = new Vector3(0f, 0f, -10f)};
+
+			model = new Model();
+			model.Initialize(directxDevice.Device);
+
+			colorShader = new ColorShader();
+			colorShader.Initialize(directxDevice.Device);
+
 			return true;
 		}
 
@@ -55,6 +67,20 @@ namespace RenderTest.Drawing
 
 		private void Shutdown()
 		{
+			camera = null;
+
+			if(model != null)
+			{
+				model.Dispose();
+				model = null;
+			}
+
+			if(colorShader != null)
+			{
+				colorShader.Dispose();
+				colorShader = null;
+			}
+
 			if(directxDevice != null)
 			{
 				directxDevice.Shutdown();
@@ -70,6 +96,14 @@ namespace RenderTest.Drawing
 		private bool Render()
 		{
 			directxDevice.BeginScene(Color.Gray);
+
+			camera.Render();
+			model.Render(directxDevice.Context);
+			var flag = colorShader.Render(directxDevice.Context, model.VertexCount, directxDevice.WorldMatrix, camera.ViewMatrix, directxDevice.ProjectionMatrix);
+
+			if(!flag)
+				return false;
+
 			directxDevice.EndScene();
 
 			return true;

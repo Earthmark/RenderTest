@@ -39,7 +39,7 @@ float4 ColorPixelShader(PixelInputType input)
 
 technique11 ColorShader
 {
-	pass Pass1
+	pass ColorPass
 	{
 		SetVertexShader(CompileShader(vs_4_0, ColorVertexShader()));
 		SetPixelShader(CompileShader(ps_4_0, ColorPixelShader()));

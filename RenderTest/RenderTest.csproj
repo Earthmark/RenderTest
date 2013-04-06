@@ -73,9 +73,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Drawing\ColorShader.cs" />
     <Compile Include="Drawing\D3D.cs" />
     <Compile Include="Drawing\Model.cs" />
     <Compile Include="Drawing\VertexTypes.cs" />
+    <Compile Include="Main\Camera.cs" />
     <Compile Include="Main\Core.cs" />
     <Compile Include="Drawing\Graphics.cs" />
     <Compile Include="Control\Input.cs" />
