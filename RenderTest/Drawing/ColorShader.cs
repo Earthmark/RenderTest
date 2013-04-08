@@ -24,7 +24,7 @@ namespace RenderTest.Drawing
 
 		public bool Initialize(Device device)
 		{
-			return InitializeShader(device, "");
+			return InitializeShader(device, "Shaders/Color.fx");
 		}
 
 		~ColorShader()
