@@ -10,7 +10,7 @@ namespace RenderTest.Main
 		{
 			var assemblyUri = new Uri(Assembly.GetEntryAssembly().CodeBase);
 			var assemblyPath = Path.GetDirectoryName(assemblyUri.LocalPath);
-			var newPath = Path.GetFullPath(Path.Combine(assemblyPath, (IntPtr.Size == 4 ? "x86" : "x64"))) + ";" + System.Environment.GetEnvironmentVariable("PATH");
+			var newPath = Path.GetFullPath(Path.Combine(assemblyPath, (Environment.Is64BitProcess ? "x64" : "x86"))) + ";" + System.Environment.GetEnvironmentVariable("PATH");
 
 			Environment.SetEnvironmentVariable("PATH", newPath);
 

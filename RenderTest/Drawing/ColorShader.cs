@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using RenderTest.Shaders;
 using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.IO;
@@ -58,7 +59,7 @@ namespace RenderTest.Drawing
 		{
 			try
 			{
-				var effect = new Effect(device, NativeFile.ReadAllBytes(str));
+				var effect = ShaderCompiler.GetEffect("ColorShader", device, str);
 				pass = effect.GetTechniqueByName("ColorShader").GetPassByName("ColorPass");
 
 				layout = new InputLayout(device, pass.Description.Signature, ColorDrawingVertex.VertexDeclaration);
