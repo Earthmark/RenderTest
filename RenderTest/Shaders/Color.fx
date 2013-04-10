@@ -1,6 +1,6 @@
-﻿float4x4 world;
-float4x4 view;
-float4x4 projection;
+﻿float4x4 World;
+float4x4 View;
+float4x4 Projection;
 
 struct VertexInputType
 {
@@ -18,11 +18,9 @@ PixelInputType ColorVertexShader(VertexInputType input)
 {
 	PixelInputType output;
 
-	input.position.w = 1.0f;
-
-	output.position = mul(input.position, world);
-	output.position = mul(output.position, view);
-	output.position = mul(output.position, projection);
+	output.position = mul(input.position, World);
+	output.position = mul(output.position, View);
+	output.position = mul(output.position, Projection);
 
 	output.color = input.color;
 
@@ -34,9 +32,9 @@ float4 ColorPixelShader(PixelInputType input) : SV_Target
 	return input.color;
 }
 
-technique11 ColorShader
+technique10 ColorShader
 {
-	pass ColorPass
+	pass Pass1
 	{
 		SetVertexShader(CompileShader(vs_4_0, ColorVertexShader()));
 		SetPixelShader(CompileShader(ps_4_0, ColorPixelShader()));

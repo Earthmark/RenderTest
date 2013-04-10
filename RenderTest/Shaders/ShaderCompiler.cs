@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows.Forms;
 using SharpDX.D3DCompiler;
+using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 
 namespace RenderTest.Shaders
@@ -37,17 +38,12 @@ namespace RenderTest.Shaders
 				var info = new FileInfo(fileInfo);
 				if(info.Exists)
 				{
-					var result = ShaderBytecode.CompileFromFile(info.FullName, "fx_4_0");
-					if(!result.HasErrors)
+					var str = ShaderBytecode.PreprocessFromFile(info.FullName);
+					using(var result = ShaderBytecode.Compile(str, "fx_4_0", ShaderFlags.None, EffectFlags.None))
 					{
 						effect = new Effect(device, result);
 						effects[name] = effect;
 					}
-					else
-					{
-						MessageBox.Show("Shader compilation error: " + result.ResultCode + " " + result.Message);
-					}
-					result.Dispose();
 				}
 			}
 			return effect;

@@ -14,6 +14,8 @@ namespace RenderTest.Drawing
 	{
 		#region Fields
 
+		private Effect effect;
+
 		/// <summary>
 		/// The current effect pass, representing a color vertex and pixel shader.
 		/// </summary>
@@ -99,8 +101,8 @@ namespace RenderTest.Drawing
 		{
 			try
 			{
-				var effect = ShaderCompiler.GetEffect("ColorShader", device, str);
-				pass = effect.GetTechniqueByName("ColorShader").GetPassByName("ColorPass");
+				effect = ShaderCompiler.GetEffect("ColorShader", device, str);
+				pass = effect.GetTechniqueByName("ColorShader").GetPassByName("Pass1");
 
 				layout = new InputLayout(device, pass.Description.Signature, ColorDrawingVertex.VertexDeclaration);
 
@@ -155,18 +157,13 @@ namespace RenderTest.Drawing
 				view.Transpose();
 				projection.Transpose();
 
-				DataStream stream;
-				context.MapSubresource(matrixBuffer, MapMode.WriteDiscard, MapFlags.None, out stream);
+				effect.GetVariableByName("world").AsMatrix().SetMatrix(world);
+				effect.GetVariableByName("view").AsMatrix().SetMatrix(view);
+				effect.GetVariableByName("projection").AsMatrix().SetMatrix(projection);
 
-				stream.Write(world);
-				stream.Write(view);
-				stream.Write(projection);
+				pass = effect.GetTechniqueByName("ColorShader").GetPassByName("Pass1");
 
-				context.UnmapSubresource(matrixBuffer, 0);
-
-				const int bufferNum = 0;
-
-				context.VertexShader.SetConstantBuffer(bufferNum, matrixBuffer);
+				pass.Apply(context);
 
 				return true;
 			}
