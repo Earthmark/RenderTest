@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-using System.Reflection;
 using System.Windows.Forms;
 using RenderTest.Control;
 using SharpDX;
@@ -15,6 +14,9 @@ namespace RenderTest.Main
 	{
 		#region Fields
 		
+		/// <summary>
+		/// True of the window was closed, all systems should be shut down.
+		/// </summary>
 		private static bool closed;
 
 		#endregion
@@ -23,11 +25,13 @@ namespace RenderTest.Main
 
 		/// <summary>
 		/// The height of the viewport.
+		/// TODO: Convert to varible, be able to reset the D3D driver.
 		/// </summary>
 		public const int Height = 600;
 
 		/// <summary>
 		/// The width of the viewport.
+		/// TODO: Convert to varible, be able to reset the D3D driver.
 		/// </summary>
 		public const int Width = 800;
 
@@ -36,17 +40,17 @@ namespace RenderTest.Main
 		#region Properties
 
 		/// <summary>
-		/// The graphics manager.
+		/// The <see cref="Graphics"/> instance used as the current manager.
 		/// </summary>
 		public static Graphics Graphics { get; private set; }
 
 		/// <summary>
-		/// The input manager.
+		/// The <see cref="Input"/> instance used as the current manager.
 		/// </summary>
 		public static Input Input { get; private set; }
 
 		/// <summary>
-		/// The render form used for drawing.
+		/// The <see cref="RenderForm"/> used for drawing.
 		/// </summary>
 		public static Form RenderForm { get; private set; }
 
@@ -56,7 +60,7 @@ namespace RenderTest.Main
 		public static TimerTick Timer { get; private set; }
 
 		/// <summary>
-		/// Gets if the renderform was closed, if set to true the form is closed.
+		/// Gets if the <see cref="RenderForm"/> was closed, if set to true the is closed.
 		/// </summary>
 		public static bool Closed
 		{
@@ -120,31 +124,43 @@ namespace RenderTest.Main
 		#region Methods
 
 		/// <summary>
-		/// Starts the current renderloop.
+		/// Starts the current <see cref="RenderLoop"/>.
 		/// </summary>
 		public static void Run()
 		{
 			RenderLoop.Run(RenderForm, Render);
 		}
 
+		/// <summary>
+		/// The loop for drawing the <see cref="Graphics"/> device.
+		/// Also contains tick and update loops.
+		/// </summary>
 		private static void Render()
 		{
-			if(Closed)
+			if (Closed)
 				return;
 
 			Timer.Tick();
 
-			if(!Frame())
+			if(Input[Keys.Escape] || !Frame())
 			{
 				RenderForm.Close();
 			}
 		}
 
+		/// <summary>
+		/// Draws the different render stages.
+		/// </summary>
+		/// <returns>If drawing was successful, false if there was errors.</returns>
 		private static bool Frame()
 		{
-			return !Input[Keys.Escape] && Graphics.Frame();
+			return Graphics.Frame();
 		}
 
+		/// <summary>
+		/// Starts the <see cref="RenderForm"/>.
+		/// TODO: Handle manual resize.
+		/// </summary>
 		private static void InitializeWindow()
 		{
 			RenderForm = new RenderForm("RenderTest")
@@ -157,6 +173,9 @@ namespace RenderTest.Main
 			RenderForm.MouseLeave += (obj, args) => Cursor.Hide();
 		}
 
+		/// <summary>
+		/// Closes, disposes, and removes the <see cref="RenderForm"/>.
+		/// </summary>
 		private static void ShutdownWindow()
 		{
 			RenderForm.Close();

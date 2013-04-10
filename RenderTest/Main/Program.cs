@@ -1,17 +1,21 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 
 namespace RenderTest.Main
 {
-	internal sealed class Program
+	/// <summary>
+	/// The launching point of the program.
+	/// </summary>
+	internal static class Program
 	{
+		/// <summary>
+		/// The launching point of the program.
+		/// </summary>
+		/// <param name="args">Any command line arguemnts.</param>
+		[Obsolete("Do not launch the program internally.", true)]
 		private static void Main(string[] args)
 		{
-			var assemblyUri = new Uri(Assembly.GetEntryAssembly().CodeBase);
-			var assemblyPath = Path.GetDirectoryName(assemblyUri.LocalPath);
-			var newPath = Path.GetFullPath(Path.Combine(assemblyPath, (Environment.Is64BitProcess ? "x64" : "x86"))) + ";" + System.Environment.GetEnvironmentVariable("PATH");
-
+			var newPath = Path.Combine(Environment.CurrentDirectory, Environment.Is64BitProcess ? "x64" : "x86") + ";" + Environment.GetEnvironmentVariable("PATH");
 			Environment.SetEnvironmentVariable("PATH", newPath);
 
 			if(Core.Initialize())

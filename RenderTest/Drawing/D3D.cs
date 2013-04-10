@@ -4,31 +4,104 @@ using SharpDX;
 using SharpDX.DXGI;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
+using SharpDX.Windows;
 using Device = SharpDX.Direct3D11.Device;
 using Device1 = SharpDX.Direct3D11.Device1;
 using Resource = SharpDX.Direct3D11.Resource;
 
 namespace RenderTest.Drawing
 {
-	public sealed class D3D
+	/// <summary>
+	/// The base class used for Direct3D usage.
+	/// </summary>
+	public sealed class D3D : IDisposable
 	{
+		#region Field
+		
+		/// <summary>
+		/// The swap chain linked to the current <see cref="Device1"/>.
+		/// </summary>
 		private SwapChain1 swapChain;
+
+		/// <summary>
+		/// The current target linked to the current <see cref="Device1"/>.
+		/// </summary>
 		private RenderTargetView renderTargetView;
+
+		/// <summary>
+		/// The current stencil buffer linked to the current <see cref="Device1"/>.
+		/// </summary>
 		private Texture2D depthStencilBuffer;
+
+		/// <summary>
+		/// The state of the <see cref="DepthStencilState"/> to the current <see cref="Device1"/>.
+		/// </summary>
 		private DepthStencilState depthStencilState;
+
+		/// <summary>
+		/// The current <see cref="DepthStencilView"/> linked to the current <see cref="Device1"/>.
+		/// </summary>
 		private DepthStencilView depthStencilView;
+
+		/// <summary>
+		/// The <see cref="RasterizerState"/> linked to the current <see cref="Device1"/>.
+		/// </summary>
 		private RasterizerState rasterState;
+
+		/// <summary>
+		/// The current <see cref="Adapter"/> linked to the current <see cref="Device1"/>.
+		/// </summary>
 		private Adapter adapter;
 
+		#endregion
+
+		#region Properties
+
+		/// <summary>
+		/// The current dedicated memory for the video card.
+		/// </summary>
 		public int VideoCardMemory { get; private set; }
+		
+		/// <summary>
+		/// The name of the current Video Card.
+		/// </summary>
 		public string VideoCardDescription { get; private set; }
+
+		/// <summary>
+		/// The current <see cref="Device1"/> device, to be used in linking to buffers and whatnot.
+		/// </summary>
 		public Device1 Device { get; private set; }
+
+		/// <summary>
+		/// The current <see cref="DeviceContext1"/> linked to the <see cref="Device1"/>.
+		/// </summary>
 		public DeviceContext1 Context { get; private set; }
 
+		/// <summary>
+		/// The matrix representing the starting matrix.
+		/// </summary>
 		public Matrix ProjectionMatrix { get; private set; }
+
+		/// <summary>
+		/// The world translation matrix.
+		/// </summary>
 		public Matrix WorldMatrix { get; private set; }
+		
+		/// <summary>
+		/// The ortho translation matrix.
+		/// </summary>
 		public Matrix OrthoMatrix { get; private set; }
 
+		#endregion
+
+		#region Initialize and shutdown
+
+		/// <summary>
+		/// Starts the current instance as linked from a <see cref="Graphics"/> manager.
+		/// </summary>
+		/// <param name="graphics">The object to get information from.</param>
+		/// <param name="hwnd">The pointer to the current <see cref="RenderForm"/>.</param>
+		/// <returns>If the device binding was successful.</returns>
 		public bool Initialize(Graphics graphics, IntPtr hwnd)
 		{
 			try
@@ -60,8 +133,8 @@ namespace RenderTest.Drawing
 				{
 					adapter = dxgiDevice2.Adapter;
 					VideoCardDescription = adapter.Description.Description;
-					VideoCardMemory = adapter.Description.DedicatedVideoMemory << 10 << 10;
-
+					VideoCardMemory = adapter.Description.DedicatedVideoMemory >> 10 >> 10;
+					
 					using(var dxgiFactory2 = adapter.GetParent<Factory2>())
 					{
 						dxgiFactory2.MakeWindowAssociation(hwnd, WindowAssociationFlags.IgnoreAltEnter);
@@ -163,7 +236,27 @@ namespace RenderTest.Drawing
 			}
 		}
 
-		public void Shutdown()
+		/// <summary>
+		/// Finalize, used for emergency disposing.
+		/// </summary>
+		~D3D()
+		{
+			Shutdown();
+		}
+
+		/// <summary>
+		/// Disposes the current instance.
+		/// </summary>
+		public void Dispose()
+		{
+			GC.SuppressFinalize(this);
+			Shutdown();
+		}
+
+		/// <summary>
+		/// Does actual cleanup.
+		/// </summary>
+		private void Shutdown()
 		{
 			if(swapChain != null)
 			{
@@ -213,6 +306,14 @@ namespace RenderTest.Drawing
 			}
 		}
 
+		#endregion
+
+		#region Methods
+
+		/// <summary>
+		/// Clears the rendertarget with the specified color.
+		/// </summary>
+		/// <param name="color">The color to clear with.</param>
 		public void BeginScene(Color4 color)
 		{
 			Context.ClearDepthStencilView(depthStencilView, DepthStencilClearFlags.Depth, 1, 0);
@@ -220,9 +321,14 @@ namespace RenderTest.Drawing
 			Context.ClearRenderTargetView(renderTargetView, color);
 		}
 
+		/// <summary>
+		/// Ends the current presentation information.
+		/// </summary>
 		public void EndScene()
 		{
 			swapChain.Present(Core.Graphics.VSync ? 1 : 0, 0);
 		}
+
+		#endregion
 	}
 }

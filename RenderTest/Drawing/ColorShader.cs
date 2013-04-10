@@ -3,26 +3,41 @@ using System.Windows.Forms;
 using RenderTest.Shaders;
 using SharpDX;
 using SharpDX.Direct3D11;
-using SharpDX.IO;
 using Buffer = SharpDX.Direct3D11.Buffer;
 
 namespace RenderTest.Drawing
 {
+	/// <summary>
+	/// Encapsulates a color <see cref="Effect"/> set of Vertex and Pixel shaders.
+	/// </summary>
 	public sealed class ColorShader : IDisposable
 	{
-		private struct MatrixSetBuffer
-		{
-			// ReSharper disable NotAccessedField.Local
-			public Matrix World;
-			public Matrix View;
-			public Matrix Projection;
-			// ReSharper restore NotAccessedField.Local
-		};
+		#region Fields
 
+		/// <summary>
+		/// The current effect pass, representing a color vertex and pixel shader.
+		/// </summary>
 		private EffectPass pass;
+
+		/// <summary>
+		/// The layout of data to bind.
+		/// </summary>
 		private InputLayout layout;
+
+		/// <summary>
+		/// The buffer of matricies to bind.
+		/// </summary>
 		private Buffer matrixBuffer;
 
+		#endregion
+
+		#region Initialize and Shutdown
+
+		/// <summary>
+		/// Binds the effect shader to the specified <see cref="Device"/>.
+		/// </summary>
+		/// <param name="device">The device to bind the shader to.</param>
+		/// <returns>If the binding was successful.</returns>
 		public bool Initialize(Device device)
 		{
 			return InitializeShader(device, "Shaders/Color.fx");
@@ -33,17 +48,36 @@ namespace RenderTest.Drawing
 			Shutdown();
 		}
 
+		/// <summary>
+		/// Disposes the current color shader, as well as frees the specified resources.
+		/// </summary>
 		public void Dispose()
 		{
 			GC.SuppressFinalize(this);
 			Shutdown();
 		}
 
+		/// <summary>
+		/// Does the actual shutdown.
+		/// </summary>
 		private void Shutdown()
 		{
 			ShutdownShader();
 		}
 
+		#endregion
+
+		#region Methods
+
+		/// <summary>
+		/// Draws the devices to the specified <see cref="DeviceContext"/>.
+		/// </summary>
+		/// <param name="context">The context to draw from.</param>
+		/// <param name="indexCount">The number of indicies to draw.</param>
+		/// <param name="world">The world <see cref="Matrix"/> to use for transforms.</param>
+		/// <param name="view">The view <see cref="Matrix"/> to use for transforms.</param>
+		/// <param name="projection">The projection <see cref="Matrix"/> to use for transforms.</param>
+		/// <returns>If the drawing works correctly.</returns>
 		public bool Render(DeviceContext context, int indexCount, Matrix world, Matrix view, Matrix projection)
 		{
 			var result = SetShaderParameters(context, world, view, projection);
@@ -55,6 +89,12 @@ namespace RenderTest.Drawing
 			return false;
 		}
 
+		/// <summary>
+		/// Initializes the shaders to the specified <see cref="Device"/>.
+		/// </summary>
+		/// <param name="device">The device to bind to.</param>
+		/// <param name="str">The name of the shader to load.</param>
+		/// <returns>If the binding was successful.</returns>
 		private bool InitializeShader(Device device, string str)
 		{
 			try
@@ -64,7 +104,7 @@ namespace RenderTest.Drawing
 
 				layout = new InputLayout(device, pass.Description.Signature, ColorDrawingVertex.VertexDeclaration);
 
-				var matrixBufferInfo = new BufferDescription(Matrix.SizeInBytes, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+				var matrixBufferInfo = new BufferDescription(Matrix.SizeInBytes * 3, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
 
 				matrixBuffer = new Buffer(device, matrixBufferInfo);
 
@@ -76,7 +116,10 @@ namespace RenderTest.Drawing
 				return false;
 			}
 		}
-
+		
+		/// <summary>
+		/// Shuts down the current resources.
+		/// </summary>
 		private void ShutdownShader()
 		{
 			if(layout != null)
@@ -96,6 +139,14 @@ namespace RenderTest.Drawing
 			}
 		}
 
+		/// <summary>
+		/// Binds the shader and world matricies.
+		/// </summary>
+		/// <param name="context">The context to draw from.</param>
+		/// <param name="world">The world <see cref="Matrix"/> to draw from.</param>
+		/// <param name="view">The view <see cref="Matrix"/> to use for transforms.</param>
+		/// <param name="projection">The projection <see cref="Matrix"/> to use for transforms.</param>
+		/// <returns></returns>
 		private bool SetShaderParameters(DeviceContext context, Matrix world, Matrix view, Matrix projection)
 		{
 			try
@@ -107,14 +158,9 @@ namespace RenderTest.Drawing
 				DataStream stream;
 				context.MapSubresource(matrixBuffer, MapMode.WriteDiscard, MapFlags.None, out stream);
 
-				var matrixSet = new MatrixSetBuffer
-				{
-					World = world,
-					View = view,
-					Projection = projection
-				};
-
-				stream.Write(matrixSet);
+				stream.Write(world);
+				stream.Write(view);
+				stream.Write(projection);
 
 				context.UnmapSubresource(matrixBuffer, 0);
 
@@ -130,6 +176,11 @@ namespace RenderTest.Drawing
 			}
 		}
 
+		/// <summary>
+		/// Draws using the current <see cref="DeviceContext"/>, after the data has been bound.
+		/// </summary>
+		/// <param name="context">The context to draw from.</param>
+		/// <param name="num">The number of indicies to draw.</param>
 		private void RenderShader(DeviceContext context, int num)
 		{
 			context.InputAssembler.InputLayout = layout;
@@ -138,5 +189,7 @@ namespace RenderTest.Drawing
 
 			context.DrawIndexed(num, 0, 0);
 		}
+
+		#endregion
 	}
 }

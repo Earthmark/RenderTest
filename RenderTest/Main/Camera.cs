@@ -1,18 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SharpDX;
+﻿using SharpDX;
 
 namespace RenderTest.Main
 {
+	/// <summary>
+	/// A set of positions and rotations used for drawing.
+	/// </summary>
 	public class Camera
 	{
+		#region Properties
+
+		/// <summary>
+		/// Sets the position of the camera.
+		/// </summary>
 		public Vector3 Position { get; set; }
+
+		/// <summary>
+		/// Sets the rotation of the camera.
+		/// </summary>
 		public Vector3 Rotation { get; set; }
+
+		/// <summary>
+		/// The viewmatrix, used after render is called.
+		/// </summary>
 		public Matrix ViewMatrix { get; private set; }
 
+		#endregion
+
+		#region Methods
+
+		/// <summary>
+		/// Updates the viewMatrix with the specified Position and Rotation.
+		/// </summary>
 		public void Render()
 		{
 			var up = Vector3.UnitY;
@@ -27,5 +45,7 @@ namespace RenderTest.Main
 
 			ViewMatrix = Matrix.LookAtLH(position, lookAt, up);
 		}
+
+		#endregion
 	}
 }
