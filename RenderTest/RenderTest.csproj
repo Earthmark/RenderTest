@@ -95,7 +95,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Drawing\ColorShader.cs" />
+    <Compile Include="Shaders\ColorShader.cs" />
     <Compile Include="Drawing\D3D.cs" />
     <Compile Include="Drawing\Model.cs" />
     <Compile Include="Drawing\VertexTypes.cs" />
@@ -105,7 +105,7 @@
     <Compile Include="Control\Input.cs" />
     <Compile Include="Main\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Shaders\ShaderCompiler.cs" />
+    <Compile Include="Shaders\Shaders.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>
   <ItemGroup>

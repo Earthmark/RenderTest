@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Windows.Forms;
-using RenderTest.Shaders;
+using RenderTest.Drawing;
 using SharpDX;
 using SharpDX.Direct3D11;
 
-namespace RenderTest.Drawing
+namespace RenderTest.Shaders
 {
 	/// <summary>
 	/// Encapsulates a color <see cref="Effect"/> set of Vertex and Pixel shaders.
@@ -35,7 +35,7 @@ namespace RenderTest.Drawing
 		{
 			try
 			{
-				effect = ShaderCompiler.GetEffect("ColorShader", device, "Shaders/Color.fx");
+				effect = Shaders.Get(device, "Shaders/Color.fx");
 				pass = effect.GetTechniqueByName("ColorShader").GetPassByName("Pass1");
 
 				layout = new InputLayout(device, pass.Description.Signature, ColorDrawingVertex.VertexDeclaration);

@@ -105,7 +105,7 @@ namespace RenderTest.Drawing
 				vertices[0].Color = new Color4(0f, 1f, 0f, 1f);
 
 				vertices[1].Position = new Vector4(0f, 1f, 0f, 0f); // Top middle.
-				vertices[1].Color = new Color4(0f, 1f, 0f, 1.0f);
+				vertices[1].Color = new Color4(0f, 1f, 0f, 1f);
 
 				vertices[2].Position = new Vector4(1f, -1f, 0f, 0f); // Bottom right.
 				vertices[2].Color = new Color4(0f, 1f, 0f, 1f);

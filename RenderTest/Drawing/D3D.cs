@@ -18,79 +18,43 @@ namespace RenderTest.Drawing
 	{
 		#region Field
 		
-		/// <summary>
-		/// The swap chain linked to the current <see cref="Device1"/>.
-		/// </summary>
 		private SwapChain1 swapChain;
 
-		/// <summary>
-		/// The current target linked to the current <see cref="Device1"/>.
-		/// </summary>
 		private RenderTargetView renderTargetView;
 
-		/// <summary>
-		/// The current stencil buffer linked to the current <see cref="Device1"/>.
-		/// </summary>
 		private Texture2D depthStencilBuffer;
 
-		/// <summary>
-		/// The state of the <see cref="DepthStencilState"/> to the current <see cref="Device1"/>.
-		/// </summary>
 		private DepthStencilState depthStencilState;
 
-		/// <summary>
-		/// The current <see cref="DepthStencilView"/> linked to the current <see cref="Device1"/>.
-		/// </summary>
 		private DepthStencilView depthStencilView;
 
-		/// <summary>
-		/// The <see cref="RasterizerState"/> linked to the current <see cref="Device1"/>.
-		/// </summary>
 		private RasterizerState rasterState;
 
-		/// <summary>
-		/// The current <see cref="Adapter"/> linked to the current <see cref="Device1"/>.
-		/// </summary>
 		private Adapter adapter;
 
 		#endregion
 
 		#region Properties
 
-		/// <summary>
-		/// The current dedicated memory for the video card.
-		/// </summary>
 		public int VideoCardMemory { get; private set; }
 		
-		/// <summary>
-		/// The name of the current Video Card.
-		/// </summary>
 		public string VideoCardDescription { get; private set; }
 
-		/// <summary>
-		/// The current <see cref="Device1"/> device, to be used in linking to buffers and whatnot.
-		/// </summary>
 		public Device1 Device { get; private set; }
 
-		/// <summary>
-		/// The current <see cref="DeviceContext1"/> linked to the <see cref="Device1"/>.
-		/// </summary>
 		public DeviceContext1 Context { get; private set; }
 
-		/// <summary>
-		/// The matrix representing the starting matrix.
-		/// </summary>
 		public Matrix ProjectionMatrix { get; private set; }
 
-		/// <summary>
-		/// The world translation matrix.
-		/// </summary>
 		public Matrix WorldMatrix { get; private set; }
 		
-		/// <summary>
-		/// The ortho translation matrix.
-		/// </summary>
 		public Matrix OrthoMatrix { get; private set; }
+
+		public bool FullScreen
+		{
+			get { return swapChain.IsFullScreen; }
+			set { swapChain.IsFullScreen = value; }
+		}
 
 		#endregion
 
@@ -149,7 +113,6 @@ namespace RenderTest.Drawing
 
 				var textDes = new Texture2DDescription
 				{
-
 					Width = Core.Width,
 					Height = Core.Height,
 					MipLevels = 1,
@@ -227,7 +190,7 @@ namespace RenderTest.Drawing
 				ProjectionMatrix = Matrix.PerspectiveFovLH((float) (Math.PI / 4), ((float) Core.Width) / Core.Height, graphics.ScreenNear, graphics.ScreenDepth);
 				WorldMatrix = Matrix.Identity;
 				OrthoMatrix = Matrix.OrthoLH(Core.Width, Core.Height, graphics.ScreenNear, graphics.ScreenDepth);
-
+				
 				return true;
 			}
 			catch(Exception)

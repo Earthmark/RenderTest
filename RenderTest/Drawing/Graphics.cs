@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using RenderTest.Main;
+using RenderTest.Shaders;
 using SharpDX;
 using SharpDX.Windows;
 
@@ -13,24 +14,12 @@ namespace RenderTest.Drawing
 	{
 		#region Fields
 
-		/// <summary>
-		/// The child <see cref="D3D"/> used for rendering.
-		/// </summary>
-		private D3D directxDevice;
+		private D3D directXDevice;
 		
-		/// <summary>
-		/// The <see cref="Camera"/> used for perspective.
-		/// </summary>
 		private Camera camera;
 		
-		/// <summary>
-		/// The current <see cref="Model"/> information buffer.
-		/// </summary>
 		private Model model;
 		
-		/// <summary>
-		/// The current shader used to render the verts from <see cref="Model"/>
-		/// </summary>
 		private ColorShader colorShader;
 
 		#endregion
@@ -53,14 +42,14 @@ namespace RenderTest.Drawing
 		public float ScreenNear { get; private set; }
 
 		/// <summary>
-		/// The pointer to the current <see cref="RenderForm"/>
-		/// </summary>
-		public IntPtr Hwnd { get; private set; }
-
-		/// <summary>
 		/// IF VSync is enabled.
 		/// </summary>
 		public bool VSync { get; set; }
+
+		/// <summary>
+		/// The pointer to the current <see cref="RenderForm"/>
+		/// </summary>
+		public IntPtr Hwnd { get; private set; }
 
 		#endregion
 
@@ -81,11 +70,11 @@ namespace RenderTest.Drawing
 			ScreenNear = 0.1f;
 			Hwnd = hwnd;
 
-			directxDevice = new D3D();
-			if(directxDevice == null)
+			directXDevice = new D3D();
+			if(directXDevice == null)
 				return false;
 
-			if(!directxDevice.Initialize(this, Hwnd))
+			if(!directXDevice.Initialize(this, Hwnd))
 			{
 				MessageBox.Show("Could not initialize Direct3D");
 				return false;
@@ -94,14 +83,14 @@ namespace RenderTest.Drawing
 			camera = new Camera {Position = new Vector3(0f, 0f, 10f)};
 
 			model = new Model();
-			if(!model.Initialize(directxDevice.Device))
+			if(!model.Initialize(directXDevice.Device))
 			{
 				MessageBox.Show("Could not initialize model buffers.");
 				return false;
 			}
 
 			colorShader = new ColorShader();
-			if(!colorShader.Initialize(directxDevice.Device))
+			if(!colorShader.Initialize(directXDevice.Device))
 			{
 				MessageBox.Show("Could not initialize ColorShader");
 				return false;
@@ -133,7 +122,7 @@ namespace RenderTest.Drawing
 
 			if(model.SafeDispose()) model = null;
 			if(colorShader.SafeDispose()) colorShader = null;
-			if(directxDevice.SafeDispose()) directxDevice = null;
+			if(directXDevice.SafeDispose()) directXDevice = null;
 		}
 
 		#endregion
@@ -155,15 +144,15 @@ namespace RenderTest.Drawing
 		/// <returns>If the drawing was successful.</returns>
 		private bool Render()
 		{
-			directxDevice.BeginScene(Color.Gray);
+			directXDevice.BeginScene(Color.Gray);
 
-			model.Render(directxDevice.Context);
-			var flag = colorShader.Render(directxDevice.Context, model.VertexCount, directxDevice.WorldMatrix, camera.ViewMatrix, directxDevice.ProjectionMatrix);
+			model.Render(directXDevice.Context);
+			var flag = colorShader.Render(directXDevice.Context, model.VertexCount, directXDevice.WorldMatrix, camera.ViewMatrix, directXDevice.ProjectionMatrix);
 
 			if(!flag)
 				return false;
 
-			directxDevice.EndScene();
+			directXDevice.EndScene();
 
 			return true;
 		}
