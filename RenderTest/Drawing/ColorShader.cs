@@ -3,7 +3,6 @@ using System.Windows.Forms;
 using RenderTest.Shaders;
 using SharpDX;
 using SharpDX.Direct3D11;
-using Buffer = SharpDX.Direct3D11.Buffer;
 
 namespace RenderTest.Drawing
 {
@@ -15,21 +14,13 @@ namespace RenderTest.Drawing
 		#region Fields
 
 		private Effect effect;
-
-		/// <summary>
-		/// The current effect pass, representing a color vertex and pixel shader.
-		/// </summary>
 		private EffectPass pass;
 
-		/// <summary>
-		/// The layout of data to bind.
-		/// </summary>
-		private InputLayout layout;
+		private EffectMatrixVariable worldVar;
+		private EffectMatrixVariable viewVar;
+		private EffectMatrixVariable projectVar;
 
-		/// <summary>
-		/// The buffer of matricies to bind.
-		/// </summary>
-		private Buffer matrixBuffer;
+		private InputLayout layout;
 
 		#endregion
 
@@ -42,7 +33,24 @@ namespace RenderTest.Drawing
 		/// <returns>If the binding was successful.</returns>
 		public bool Initialize(Device device)
 		{
-			return InitializeShader(device, "Shaders/Color.fx");
+			try
+			{
+				effect = ShaderCompiler.GetEffect("ColorShader", device, "Shaders/Color.fx");
+				pass = effect.GetTechniqueByName("ColorShader").GetPassByName("Pass1");
+
+				layout = new InputLayout(device, pass.Description.Signature, ColorDrawingVertex.VertexDeclaration);
+
+				worldVar = effect.GetVariableByName("World").AsMatrix();
+				viewVar = effect.GetVariableByName("View").AsMatrix();
+				projectVar = effect.GetVariableByName("Projection").AsMatrix();
+
+				return true;
+			}
+			catch (Exception e)
+			{
+				MessageBox.Show("Shader error: " + e.Message);
+				return false;
+			}
 		}
 
 		~ColorShader()
@@ -59,12 +67,16 @@ namespace RenderTest.Drawing
 			Shutdown();
 		}
 
-		/// <summary>
-		/// Does the actual shutdown.
-		/// </summary>
 		private void Shutdown()
 		{
-			ShutdownShader();
+			if (effect.SafeDispose()) effect = null;
+			if (pass.SafeDispose()) pass = null;
+
+			if (worldVar.SafeDispose()) worldVar = null;
+			if (viewVar.SafeDispose()) viewVar = null;
+			if (projectVar.SafeDispose()) projectVar = null;
+
+			if (layout.SafeDispose()) layout = null;
 		}
 
 		#endregion
@@ -92,56 +104,6 @@ namespace RenderTest.Drawing
 		}
 
 		/// <summary>
-		/// Initializes the shaders to the specified <see cref="Device"/>.
-		/// </summary>
-		/// <param name="device">The device to bind to.</param>
-		/// <param name="str">The name of the shader to load.</param>
-		/// <returns>If the binding was successful.</returns>
-		private bool InitializeShader(Device device, string str)
-		{
-			try
-			{
-				effect = ShaderCompiler.GetEffect("ColorShader", device, str);
-				pass = effect.GetTechniqueByName("ColorShader").GetPassByName("Pass1");
-
-				layout = new InputLayout(device, pass.Description.Signature, ColorDrawingVertex.VertexDeclaration);
-
-				var matrixBufferInfo = new BufferDescription(Matrix.SizeInBytes * 3, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
-
-				matrixBuffer = new Buffer(device, matrixBufferInfo);
-
-				return true;
-			}
-			catch(Exception e)
-			{
-				MessageBox.Show("Shader error: " + e.Message);
-				return false;
-			}
-		}
-		
-		/// <summary>
-		/// Shuts down the current resources.
-		/// </summary>
-		private void ShutdownShader()
-		{
-			if(layout != null)
-			{
-				layout.Dispose();
-				layout = null;
-			}
-			if(matrixBuffer != null)
-			{
-				matrixBuffer.Dispose();
-				matrixBuffer = null;
-			}
-			if(pass != null)
-			{
-				pass.Dispose();
-				pass = null;
-			}
-		}
-
-		/// <summary>
 		/// Binds the shader and world matricies.
 		/// </summary>
 		/// <param name="context">The context to draw from.</param>
@@ -157,11 +119,9 @@ namespace RenderTest.Drawing
 				view.Transpose();
 				projection.Transpose();
 
-				effect.GetVariableByName("world").AsMatrix().SetMatrix(world);
-				effect.GetVariableByName("view").AsMatrix().SetMatrix(view);
-				effect.GetVariableByName("projection").AsMatrix().SetMatrix(projection);
-
-				pass = effect.GetTechniqueByName("ColorShader").GetPassByName("Pass1");
+				worldVar.SetMatrix(world);
+				viewVar.SetMatrix(view);
+				projectVar.SetMatrix(projection);
 
 				pass.Apply(context);
 

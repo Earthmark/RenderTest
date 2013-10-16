@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using RenderTest.Drawing;
 
 namespace RenderTest.Main
 {
@@ -17,7 +18,7 @@ namespace RenderTest.Main
 		{
 			var newPath = Path.Combine(Environment.CurrentDirectory, Environment.Is64BitProcess ? "x64" : "x86") + ";" + Environment.GetEnvironmentVariable("PATH");
 			Environment.SetEnvironmentVariable("PATH", newPath);
-
+			var count = ColorDrawingVertex.SizeInBytes;
 			if(Core.Initialize())
 				Core.Run();
 			Core.Shutdown();

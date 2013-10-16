@@ -91,7 +91,7 @@ namespace RenderTest.Drawing
 				return false;
 			}
 
-			camera = new Camera {Position = new Vector3(0f, 0f, -10f)};
+			camera = new Camera {Position = new Vector3(0f, 0f, 10f)};
 
 			model = new Model();
 			if(!model.Initialize(directxDevice.Device))
@@ -131,23 +131,9 @@ namespace RenderTest.Drawing
 		{
 			camera = null;
 
-			if(model != null)
-			{
-				model.Dispose();
-				model = null;
-			}
-
-			if(colorShader != null)
-			{
-				colorShader.Dispose();
-				colorShader = null;
-			}
-
-			if(directxDevice != null)
-			{
-				directxDevice.Dispose();
-				directxDevice = null;
-			}
+			if(model.SafeDispose()) model = null;
+			if(colorShader.SafeDispose()) colorShader = null;
+			if(directxDevice.SafeDispose()) directxDevice = null;
 		}
 
 		#endregion
@@ -171,7 +157,6 @@ namespace RenderTest.Drawing
 		{
 			directxDevice.BeginScene(Color.Gray);
 
-			camera.Render();
 			model.Render(directxDevice.Context);
 			var flag = colorShader.Render(directxDevice.Context, model.VertexCount, directxDevice.WorldMatrix, camera.ViewMatrix, directxDevice.ProjectionMatrix);
 

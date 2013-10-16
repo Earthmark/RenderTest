@@ -133,16 +133,8 @@ namespace RenderTest.Drawing
 		/// </summary>
 		private void ShutdownBuffers()
 		{
-			if(indexBuffer != null)
-			{
-				indexBuffer.Dispose();
-				indexBuffer = null;
-			}
-			if(vertexBuffer != null)
-			{
-				vertexBuffer.Dispose();
-				vertexBuffer = null;
-			}
+			if(indexBuffer.SafeDispose()) indexBuffer = null;
+			if(vertexBuffer.SafeDispose()) vertexBuffer = null;
 		}
 
 		/// <summary>

@@ -1,8 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.IO;
-using System.Windows.Forms;
 using SharpDX.D3DCompiler;
-using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 
 namespace RenderTest.Shaders
@@ -14,9 +12,6 @@ namespace RenderTest.Shaders
 	{
 		#region Fields
 
-		/// <summary>
-		/// A dictonary of used effects.
-		/// </summary>
 		private static readonly ConcurrentDictionary<string, Effect> effects = new ConcurrentDictionary<string, Effect>();
 
 		#endregion
@@ -39,7 +34,7 @@ namespace RenderTest.Shaders
 				if(info.Exists)
 				{
 					var str = ShaderBytecode.PreprocessFromFile(info.FullName);
-					using(var result = ShaderBytecode.Compile(str, "fx_4_0", ShaderFlags.None, EffectFlags.None))
+					using(var result = ShaderBytecode.Compile(str, "fx_5_0", ShaderFlags.None, EffectFlags.None))
 					{
 						effect = new Effect(device, result);
 						effects[name] = effect;

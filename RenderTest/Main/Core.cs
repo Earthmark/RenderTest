@@ -104,17 +104,8 @@ namespace RenderTest.Main
 		/// </summary>
 		public static void Shutdown()
 		{
-			if(Graphics != null)
-			{
-				Graphics.Dispose();
-				Graphics = null;
-			}
-
-			if(Input != null)
-			{
-				Input.Dispose();
-				Input = null;
-			}
+			if(Graphics.SafeDispose()) Graphics = null;
+			if(Input.SafeDispose()) Input = null;
 
 			ShutdownWindow();
 		}

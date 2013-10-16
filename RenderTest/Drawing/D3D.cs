@@ -258,52 +258,18 @@ namespace RenderTest.Drawing
 		/// </summary>
 		private void Shutdown()
 		{
-			if(swapChain != null)
-			{
-				swapChain.SetFullscreenState(false, null);
-			}
+			if(swapChain != null) swapChain.SetFullscreenState(false, null);
 
-			if(rasterState != null)
-			{
-				rasterState.Dispose();
-				rasterState = null;
-			}
+			if(rasterState.SafeDispose()) rasterState = null;
 
-			if(depthStencilView != null)
-			{
-				depthStencilView.Dispose();
-				depthStencilView = null;
-			}
+			if(depthStencilView.SafeDispose()) depthStencilView = null;
+			if(depthStencilState.SafeDispose()) depthStencilState = null;
+			if(depthStencilBuffer.SafeDispose()) depthStencilBuffer = null;
 
-			if(depthStencilState != null)
-			{
-				depthStencilState.Dispose();
-				depthStencilState = null;
-			}
+			if(renderTargetView.SafeDispose()) renderTargetView = null;
 
-			if(depthStencilBuffer != null)
-			{
-				depthStencilBuffer.Dispose();
-				depthStencilBuffer = null;
-			}
-
-			if(renderTargetView != null)
-			{
-				renderTargetView.Dispose();
-				renderTargetView = null;
-			}
-
-			if(Device != null)
-			{
-				Device.Dispose();
-				Device = null;
-			}
-
-			if(swapChain != null)
-			{
-				swapChain.Dispose();
-				swapChain = null;
-			}
+			if(Device.SafeDispose()) Device = null;
+			if(swapChain.SafeDispose()) swapChain = null;
 		}
 
 		#endregion

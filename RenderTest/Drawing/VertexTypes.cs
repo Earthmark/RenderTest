@@ -11,6 +11,20 @@ namespace RenderTest.Drawing
 	[StructLayout(LayoutKind.Sequential)]
 	public struct ColorDrawingVertex
 	{
+		#region Fields
+
+		/// <summary>
+		/// The position vector, pretend it is a <see cref="Vector3"/>.
+		/// </summary>
+		public Vector4 Position;
+
+		/// <summary>
+		/// The color vector.
+		/// </summary>
+		public Color4 Color;
+
+		#endregion
+
 		#region Static components
 
 		/// <summary>
@@ -26,20 +40,6 @@ namespace RenderTest.Drawing
 		/// The size of the object in bytes.
 		/// </summary>
 		public static readonly int SizeInBytes = Marshal.SizeOf(typeof(ColorDrawingVertex));
-
-		#endregion
-
-		#region Fields
-
-		/// <summary>
-		/// The position vector, pretend it is a <see cref="Vector3"/>.
-		/// </summary>
-		public Vector4 Position;
-		
-		/// <summary>
-		/// The color vector.
-		/// </summary>
-		public Color4 Color;
 
 		#endregion
 	}

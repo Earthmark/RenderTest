@@ -22,28 +22,22 @@ namespace RenderTest.Main
 		/// <summary>
 		/// The viewmatrix, used after render is called.
 		/// </summary>
-		public Matrix ViewMatrix { get; private set; }
-
-		#endregion
-
-		#region Methods
-
-		/// <summary>
-		/// Updates the viewMatrix with the specified Position and Rotation.
-		/// </summary>
-		public void Render()
+		public Matrix ViewMatrix
 		{
-			var up = Vector3.UnitY;
-			var position = Position;
-			var lookAt = Vector3.UnitZ;
+			get
+			{
+				var up = Vector3.UnitY;
+				var position = Position;
+				var lookAt = Vector3.UnitZ;
 
-			var rotation = Rotation * 0.0174532925f;
-			var rotationMatrix = Matrix.RotationYawPitchRoll(rotation.X, rotation.Y, rotation.Z);
+				var rotation = Rotation * 0.0174532925f;
+				var rotationMatrix = Matrix.RotationYawPitchRoll(rotation.X, rotation.Y, rotation.Z);
 
-			Vector3.TransformCoordinate(ref lookAt, ref rotationMatrix, out lookAt);
-			Vector3.TransformCoordinate(ref up, ref rotationMatrix, out up);
+				Vector3.TransformCoordinate(ref lookAt, ref rotationMatrix, out lookAt);
+				Vector3.TransformCoordinate(ref up, ref rotationMatrix, out up);
 
-			ViewMatrix = Matrix.LookAtLH(position, lookAt, up);
+				return Matrix.LookAtLH(position, lookAt, up);
+			}
 		}
 
 		#endregion
