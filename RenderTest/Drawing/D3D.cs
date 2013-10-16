@@ -169,12 +169,14 @@ namespace RenderTest.Drawing
 
 				depthStencilView = new DepthStencilView(Device, depthStencilBuffer, depthStencilViewDesc);
 
+				Context.OutputMerger.SetTargets(depthStencilView, renderTargetView);
+				
 				var rasterDesc = new RasterizerStateDescription
 				{
 					IsAntialiasedLineEnabled = false,
 					CullMode = CullMode.Back,
 					DepthBias = 0,
-					DepthBiasClamp = .0f,
+					DepthBiasClamp = 0.0f,
 					IsDepthClipEnabled = true,
 					FillMode = FillMode.Solid,
 					IsFrontCounterClockwise = false,
@@ -185,6 +187,7 @@ namespace RenderTest.Drawing
 
 				rasterState = new RasterizerState(Device, rasterDesc);
 
+				Context.Rasterizer.State = rasterState;
 				Context.Rasterizer.SetViewport(0, 0, Core.Width, Core.Height);
 
 				ProjectionMatrix = Matrix.PerspectiveFovLH((float) (Math.PI / 4), ((float) Core.Width) / Core.Height, graphics.ScreenNear, graphics.ScreenDepth);

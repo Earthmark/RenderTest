@@ -125,6 +125,8 @@ namespace RenderTest.Shaders
 
 				pass.Apply(context);
 
+				context.InputAssembler.InputLayout = layout;
+
 				return true;
 			}
 			catch(Exception)
@@ -140,10 +142,6 @@ namespace RenderTest.Shaders
 		/// <param name="num">The number of indicies to draw.</param>
 		private void RenderShader(DeviceContext context, int num)
 		{
-			context.InputAssembler.InputLayout = layout;
-
-			pass.Apply(context);
-
 			context.DrawIndexed(num, 0, 0);
 		}
 
