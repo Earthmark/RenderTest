@@ -18,31 +18,31 @@ namespace RenderTest.Drawing
 	{
 		#region Field
 		
-		private SwapChain1 swapChain;
+		private SwapChain SwapChain;
 
-		private RenderTargetView renderTargetView;
+		private RenderTargetView RenderTargetView;
 
-		private Texture2D depthStencilBuffer;
+		private Texture2D DepthStencilBuffer;
 
-		private DepthStencilState depthStencilState;
+		private DepthStencilState DepthStencilState;
 
-		private DepthStencilView depthStencilView;
+		private DepthStencilView DepthStencilView;
 
-		private RasterizerState rasterState;
-
-		private Adapter adapter;
+		private RasterizerState RasterState;
 
 		#endregion
 
 		#region Properties
 
+		public bool VSync { get; private set; }
+
 		public int VideoCardMemory { get; private set; }
 		
 		public string VideoCardDescription { get; private set; }
 
-		public Device1 Device { get; private set; }
+		public Device Device { get; private set; }
 
-		public DeviceContext1 Context { get; private set; }
+		public DeviceContext Context { get; private set; }
 
 		public Matrix ProjectionMatrix { get; private set; }
 
@@ -52,8 +52,8 @@ namespace RenderTest.Drawing
 
 		public bool FullScreen
 		{
-			get { return swapChain.IsFullScreen; }
-			set { swapChain.IsFullScreen = value; }
+			get { return SwapChain.IsFullScreen; }
+			set { SwapChain.IsFullScreen = value; }
 		}
 
 		#endregion
@@ -66,52 +66,96 @@ namespace RenderTest.Drawing
 		/// <param name="graphics">The object to get information from.</param>
 		/// <param name="hwnd">The pointer to the current <see cref="RenderForm"/>.</param>
 		/// <returns>If the device binding was successful.</returns>
-		public bool Initialize(Graphics graphics, IntPtr hwnd)
+		public bool Initialize(int height, int width, float screenDepth, float screenNear, IntPtr hwnd)
 		{
 			try
 			{
-				var swapChainDescription = new SwapChainDescription1
+				// Store the vsync setting.
+				VSync = true;
+				
+				// Create a DirectX graphics interface factory.
+				var factory = new Factory();
+				// Use the factory to create an adapter for the primary graphics interface (video card).
+				var adapter = factory.GetAdapter(0);
+				// Get the primary adapter output (monitor).
+				var monitor = adapter.Outputs[0];
+				// Get modes that fit the DXGI_FORMAT_R8G8B8A8_UNORM display format for the adapter output (monitor).
+				var modes = monitor.GetDisplayModeList(Format.R8G8B8A8_UNorm, DisplayModeEnumerationFlags.Interlaced);
+				// Now go through all the display modes and find the one that matches the screen width and height.
+				// When a match is found store the the refresh rate for that monitor, if vertical sync is enabled. 
+				// Otherwise we use maximum refresh rate.
+				var rational = new Rational(0, 1);
+				if (VSync)
 				{
-					BufferCount = 1,
-					Usage = Usage.RenderTargetOutput,
-					Width = Core.Width,
-					Height = Core.Height,
-					Format = Format.R8G8B8A8_UNorm,
-					SampleDescription = new SampleDescription(1, 0),
-					Flags = SwapChainFlags.None,
-					SwapEffect = SwapEffect.Discard
-				};
-				var swapFullScreenDescription = new SwapChainFullScreenDescription
-				{
-					RefreshRate = new Rational(60, 1),
-					Windowed = true
-				};
-
-				using(var defaultDevice = new Device(DriverType.Hardware, DeviceCreationFlags.BgraSupport | DeviceCreationFlags.Debug))
-					//using (var defaultDevice = new Device(DriverType.Hardware, DeviceCreationFlags.BgraSupport))
-				{
-					Device = defaultDevice.QueryInterface<Device1>();
-				}
-
-				using(var dxgiDevice2 = Device.QueryInterface<Device2>())
-				{
-					adapter = dxgiDevice2.Adapter;
-					VideoCardDescription = adapter.Description.Description;
-					VideoCardMemory = adapter.Description.DedicatedVideoMemory >> 10 >> 10;
-					
-					using(var dxgiFactory2 = adapter.GetParent<Factory2>())
+					foreach (var mode in modes)
 					{
-						dxgiFactory2.MakeWindowAssociation(hwnd, WindowAssociationFlags.IgnoreAltEnter);
-						swapChain = dxgiFactory2.CreateSwapChainForHwnd(dxgiDevice2, hwnd, ref swapChainDescription, swapFullScreenDescription, null);
+						if (mode.Width == width && mode.Height == height)
+						{
+							rational = new Rational(mode.RefreshRate.Numerator, mode.RefreshRate.Denominator);
+							break;
+						}
 					}
 				}
 
-				Context = Device.ImmediateContext1;
+				// Get the adapter (video card) description.
+				var adapterDescription = adapter.Description;
 
-				var backBuffer = Resource.FromSwapChain<Texture2D>(swapChain, 0);
-				renderTargetView = new RenderTargetView(Device, backBuffer);
+				// Store the dedicated video card memory in megabytes.
+				VideoCardMemory = adapterDescription.DedicatedVideoMemory >> 10 >> 10;
 
-				var textDes = new Texture2DDescription
+				// Convert the name of the video card to a character array and store it.
+				VideoCardDescription = adapterDescription.Description;
+
+				// Release the adapter output.
+				monitor.Dispose();
+
+				// Release the adapter.
+				adapter.Dispose();
+
+				// Release the factory.
+				factory.Dispose();
+
+				// Initialize the swap chain description.
+				var swapChainDesc = new SwapChainDescription()
+				{
+					// Set to a single back buffer.
+					BufferCount = 1,
+					// Set the width and height of the back buffer.
+					ModeDescription = new ModeDescription(width, height, rational, Format.R8G8B8A8_UNorm),
+					// Set the usage of the back buffer.
+					Usage = Usage.RenderTargetOutput,
+					// Set the handle for the window to render to.
+					OutputHandle = hwnd,
+					// Turn multisampling off.
+					SampleDescription = new SampleDescription(1, 0),
+					// Set to full screen or windowed mode.
+					IsWindowed = true,
+					// Don't set the advanced flags.
+					Flags = SwapChainFlags.None,
+					// Discard the back buffer content after presenting.
+					SwapEffect = SwapEffect.Discard
+				};
+
+				// Create the swap chain, Direct3D device, and Direct3D device context.
+				Device device;
+				SwapChain swapChain;
+				Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.None, swapChainDesc, out device, out swapChain);
+
+				Device = device;
+				SwapChain = swapChain;
+				Context = device.ImmediateContext;
+
+				// Get the pointer to the back buffer.
+				var backBuffer = Resource.FromSwapChain<Texture2D>(SwapChain, 0);
+
+				// Create the render target view with the back buffer pointer.
+				RenderTargetView = new RenderTargetView(device, backBuffer);
+
+				// Release pointer to the back buffer as we no longer need it.
+				backBuffer.Dispose();
+
+				// Initialize and set up the description of the depth buffer.
+				var depthBufferDesc = new Texture2DDescription()
 				{
 					Width = Core.Width,
 					Height = Core.Height,
@@ -125,9 +169,11 @@ namespace RenderTest.Drawing
 					OptionFlags = ResourceOptionFlags.None
 				};
 
-				depthStencilBuffer = new Texture2D(Device, textDes);
+				// Create the texture for the depth buffer using the filled out description.
+				DepthStencilBuffer = new Texture2D(device, depthBufferDesc);
 
-				var depthStencilDesc = new DepthStencilStateDescription
+				// Initialize and set up the description of the stencil state.
+				var depthStencilDesc = new DepthStencilStateDescription()
 				{
 					IsDepthEnabled = true,
 					DepthWriteMask = DepthWriteMask.All,
@@ -135,16 +181,16 @@ namespace RenderTest.Drawing
 					IsStencilEnabled = true,
 					StencilReadMask = 0xFF,
 					StencilWriteMask = 0xFF,
-
-					FrontFace = new DepthStencilOperationDescription
+					// Stencil operation if pixel front-facing.
+					FrontFace = new DepthStencilOperationDescription()
 					{
 						FailOperation = StencilOperation.Keep,
 						DepthFailOperation = StencilOperation.Increment,
 						PassOperation = StencilOperation.Keep,
 						Comparison = Comparison.Always
 					},
-
-					BackFace = new DepthStencilOperationDescription
+					// Stencil operation if pixel is back-facing.
+					BackFace = new DepthStencilOperationDescription()
 					{
 						FailOperation = StencilOperation.Keep,
 						DepthFailOperation = StencilOperation.Decrement,
@@ -153,30 +199,36 @@ namespace RenderTest.Drawing
 					}
 				};
 
-				depthStencilState = new DepthStencilState(Device, depthStencilDesc);
+				// Create the depth stencil state.
+				DepthStencilState = new DepthStencilState(Device, depthStencilDesc);
 
-				Context.OutputMerger.SetDepthStencilState(depthStencilState, 1);
+				// Set the depth stencil state.
+				Context.OutputMerger.SetDepthStencilState(DepthStencilState, 1);
 
-				var depthStencilViewDesc = new DepthStencilViewDescription
+				// Initialize and set up the depth stencil view.
+				var depthStencilViewDesc = new DepthStencilViewDescription()
 				{
 					Format = Format.D24_UNorm_S8_UInt,
 					Dimension = DepthStencilViewDimension.Texture2D,
-					Texture2D = new DepthStencilViewDescription.Texture2DResource
+					Texture2D = new DepthStencilViewDescription.Texture2DResource()
 					{
 						MipSlice = 0
 					}
 				};
 
-				depthStencilView = new DepthStencilView(Device, depthStencilBuffer, depthStencilViewDesc);
+				// Create the depth stencil view.
+				DepthStencilView = new DepthStencilView(Device, DepthStencilBuffer, depthStencilViewDesc);
 
-				Context.OutputMerger.SetTargets(depthStencilView, renderTargetView);
-				
-				var rasterDesc = new RasterizerStateDescription
+				// Bind the render target view and depth stencil buffer to the output render pipeline.
+				Context.OutputMerger.SetTargets(DepthStencilView, RenderTargetView);
+
+				// Setup the raster description which will determine how and what polygon will be drawn.
+				var rasterDesc = new RasterizerStateDescription()
 				{
 					IsAntialiasedLineEnabled = false,
 					CullMode = CullMode.Back,
 					DepthBias = 0,
-					DepthBiasClamp = 0.0f,
+					DepthBiasClamp = .0f,
 					IsDepthClipEnabled = true,
 					FillMode = FillMode.Solid,
 					IsFrontCounterClockwise = false,
@@ -185,15 +237,24 @@ namespace RenderTest.Drawing
 					SlopeScaledDepthBias = .0f
 				};
 
-				rasterState = new RasterizerState(Device, rasterDesc);
+				// Create the rasterizer state from the description we just filled out.
+				RasterState = new RasterizerState(Device, rasterDesc);
 
-				Context.Rasterizer.State = rasterState;
-				Context.Rasterizer.SetViewport(0, 0, Core.Width, Core.Height);
+				// Now set the rasterizer state.
+				Context.Rasterizer.State = RasterState;
 
-				ProjectionMatrix = Matrix.PerspectiveFovLH((float) (Math.PI / 4), ((float) Core.Width) / Core.Height, graphics.ScreenNear, graphics.ScreenDepth);
+				// Setup and create the viewport for rendering.
+				Context.Rasterizer.SetViewport(0, 0, width, height, 0, 1);
+
+				// Setup and create the projection matrix.
+				ProjectionMatrix = Matrix.PerspectiveFovLH((float)(Math.PI / 4), ((float)width) / height, screenNear, screenDepth);
+
+				// Initialize the world matrix to the identity matrix.
 				WorldMatrix = Matrix.Identity;
-				OrthoMatrix = Matrix.OrthoLH(Core.Width, Core.Height, graphics.ScreenNear, graphics.ScreenDepth);
-				
+
+				// Create an orthographic projection matrix for 2D rendering.
+				OrthoMatrix = Matrix.OrthoLH(width, height, screenNear, screenDepth);
+
 				return true;
 			}
 			catch(Exception)
@@ -224,18 +285,18 @@ namespace RenderTest.Drawing
 		/// </summary>
 		private void Shutdown()
 		{
-			if(swapChain != null) swapChain.SetFullscreenState(false, null);
+			if(SwapChain != null) SwapChain.SetFullscreenState(false, null);
 
-			if(rasterState.SafeDispose()) rasterState = null;
+			if(RasterState.SafeDispose()) RasterState = null;
 
-			if(depthStencilView.SafeDispose()) depthStencilView = null;
-			if(depthStencilState.SafeDispose()) depthStencilState = null;
-			if(depthStencilBuffer.SafeDispose()) depthStencilBuffer = null;
+			if(DepthStencilView.SafeDispose()) DepthStencilView = null;
+			if(DepthStencilState.SafeDispose()) DepthStencilState = null;
+			if(DepthStencilBuffer.SafeDispose()) DepthStencilBuffer = null;
 
-			if(renderTargetView.SafeDispose()) renderTargetView = null;
+			if(RenderTargetView.SafeDispose()) RenderTargetView = null;
 
 			if(Device.SafeDispose()) Device = null;
-			if(swapChain.SafeDispose()) swapChain = null;
+			if(SwapChain.SafeDispose()) SwapChain = null;
 		}
 
 		#endregion
@@ -248,9 +309,9 @@ namespace RenderTest.Drawing
 		/// <param name="color">The color to clear with.</param>
 		public void BeginScene(Color4 color)
 		{
-			Context.ClearDepthStencilView(depthStencilView, DepthStencilClearFlags.Depth, 1, 0);
+			Context.ClearDepthStencilView(DepthStencilView, DepthStencilClearFlags.Depth, 1, 0);
 
-			Context.ClearRenderTargetView(renderTargetView, color);
+			Context.ClearRenderTargetView(RenderTargetView, color);
 		}
 
 		/// <summary>
@@ -258,7 +319,7 @@ namespace RenderTest.Drawing
 		/// </summary>
 		public void EndScene()
 		{
-			swapChain.Present(Core.Graphics.VSync ? 1 : 0, 0);
+			SwapChain.Present(VSync ? 1 : 0, PresentFlags.None);
 		}
 
 		#endregion

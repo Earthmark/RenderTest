@@ -20,7 +20,7 @@ namespace RenderTest.Drawing
 		
 		private Model model;
 		
-		private ColorShader colorShader;
+		private TextureShader shader;
 
 		#endregion
 
@@ -74,13 +74,13 @@ namespace RenderTest.Drawing
 			if(directXDevice == null)
 				return false;
 
-			if(!directXDevice.Initialize(this, Hwnd))
+			if(!directXDevice.Initialize(height, width, 1000f, 0.1f, Hwnd))
 			{
 				MessageBox.Show("Could not initialize Direct3D");
 				return false;
 			}
 
-			camera = new Camera {Position = new Vector3(0f, 0f, 10f)};
+			camera = new Camera {Position = new Vector3(0f, 0f, -10f)};
 
 			model = new Model();
 			if(!model.Initialize(directXDevice.Device))
@@ -89,10 +89,10 @@ namespace RenderTest.Drawing
 				return false;
 			}
 
-			colorShader = new ColorShader();
-			if(!colorShader.Initialize(directXDevice.Device))
+			shader = new TextureShader();
+			if(!shader.Initialize(directXDevice.Device))
 			{
-				MessageBox.Show("Could not initialize ColorShader");
+				MessageBox.Show("Could not initialize shader");
 				return false;
 			}
 
@@ -121,7 +121,7 @@ namespace RenderTest.Drawing
 			camera = null;
 
 			if(model.SafeDispose()) model = null;
-			if(colorShader.SafeDispose()) colorShader = null;
+			if(shader.SafeDispose()) shader = null;
 			if(directXDevice.SafeDispose()) directXDevice = null;
 		}
 
@@ -147,7 +147,7 @@ namespace RenderTest.Drawing
 			directXDevice.BeginScene(Color.Gray);
 
 			model.Render(directXDevice.Context);
-			var flag = colorShader.Render(directXDevice.Context, model.VertexCount, directXDevice.WorldMatrix, camera.ViewMatrix, directXDevice.ProjectionMatrix);
+			var flag = shader.Render(directXDevice.Context, model.IndexCount, directXDevice.WorldMatrix, camera.ViewMatrix, directXDevice.ProjectionMatrix);
 
 			if(!flag)
 				return false;

@@ -33,10 +33,10 @@ namespace RenderTest.Main
 				var rotation = Rotation * 0.0174532925f;
 				var rotationMatrix = Matrix.RotationYawPitchRoll(rotation.Y, rotation.X, rotation.Z);
 
-				Vector3.TransformCoordinate(ref lookAt, ref rotationMatrix, out lookAt);
-				Vector3.TransformCoordinate(ref up, ref rotationMatrix, out up);
+				lookAt = Vector3.TransformCoordinate(lookAt, rotationMatrix);
+				up = Vector3.TransformCoordinate(up, rotationMatrix);
 
-				lookAt =+ position;
+				lookAt = position + lookAt;
 
 				return Matrix.LookAtLH(position, lookAt, up);
 			}

@@ -8,10 +8,7 @@ using Buffer = SharpDX.Direct3D11.Buffer;
 
 namespace RenderTest.Shaders
 {
-	/// <summary>
-	/// Encapsulates a color <see cref="Effect"/> set of Vertex and Pixel shaders.
-	/// </summary>
-	public sealed class ColorShader : IDisposable
+	public class TextureShader : IDisposable
 	{
 		#region Fields
 
@@ -35,15 +32,15 @@ namespace RenderTest.Shaders
 			try
 			{
 				matrixBuffer = new Buffer(device, Matrix.SizeInBytes * 3, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0) {DebugName = "Matrix buffer"};
-				using (var bytecode = ShaderBytecode.CompileFromFile("Shaders/Color.vs", "ColorVertexShader", "vs_4_0"))
+				using (var bytecode = ShaderBytecode.CompileFromFile("Shaders/Texture.vs", "TextureVertexShader", "vs_4_0"))
 				{
-					layout = new InputLayout(device, ShaderSignature.GetInputSignature(bytecode), ColorDrawingVertex.VertexDeclaration) { DebugName = "Color vertex layout" };
-					vertexShader = new VertexShader(device, bytecode) { DebugName = "Color vertex shader" };
+					layout = new InputLayout(device, ShaderSignature.GetInputSignature(bytecode), TextureDrawingVertex.VertexDeclaration) { DebugName = "Color vertex layout" };
+					vertexShader = new VertexShader(device, bytecode) { DebugName = "Texture vertex shader" };
 				}
 
-				using (var bytecode = ShaderBytecode.CompileFromFile("Shaders/Color.ps", "ColorPixelShader", "ps_4_0"))
+				using (var bytecode = ShaderBytecode.CompileFromFile("Shaders/Texture.ps", "TexturePixelShader", "ps_4_0"))
 				{
-					pixelShader = new PixelShader(device, bytecode) { DebugName = "Color pixel shader" };
+					pixelShader = new PixelShader(device, bytecode) { DebugName = "Texture pixel shader" };
 				}
 
 				return true;
@@ -55,7 +52,7 @@ namespace RenderTest.Shaders
 			}
 		}
 
-		~ColorShader()
+		~TextureShader()
 		{
 			Shutdown();
 		}

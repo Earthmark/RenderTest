@@ -99,16 +99,16 @@ namespace RenderTest.Drawing
 			{
 				VertexCount = IndexCount = 3;
 
-				var vertices = new ColorDrawingVertex[3];
+				var vertices = new TextureDrawingVertex[3];
 
 				vertices[0].Position = new Vector4(-1f, -1f, 0f, 0f); // Bottom left.
-				vertices[0].Color = new Color4(0f, 1f, 0f, 1f);
+				vertices[0].Tex = new Vector2(0f, 1f);
 
 				vertices[1].Position = new Vector4(0f, 1f, 0f, 0f); // Top middle.
-				vertices[1].Color = new Color4(0f, 1f, 0f, 1f);
+				vertices[1].Tex = new Vector2(0f, 0.5f);
 
 				vertices[2].Position = new Vector4(1f, -1f, 0f, 0f); // Bottom right.
-				vertices[2].Color = new Color4(0f, 1f, 0f, 1f);
+				vertices[2].Tex = new Vector2(1f, 1f);
 
 				vertexBuffer = Buffer.Create(device, BindFlags.VertexBuffer, vertices);
 
@@ -143,7 +143,7 @@ namespace RenderTest.Drawing
 		/// <param name="context1">The context to bind and use for drawing.</param>
 		private void RenderBuffers(DeviceContext context1)
 		{
-			context1.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(vertexBuffer, ColorDrawingVertex.SizeInBytes, 0));
+			context1.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(vertexBuffer, TextureDrawingVertex.SizeInBytes, 0));
 			context1.InputAssembler.SetIndexBuffer(indexBuffer, Format.R32_UInt, 0);
 			context1.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 		}
