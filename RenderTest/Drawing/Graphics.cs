@@ -19,7 +19,7 @@ namespace RenderTest.Drawing
 		private Camera camera;
 		
 		private Model model;
-		
+
 		private TextureShader shader;
 
 		#endregion
@@ -80,7 +80,7 @@ namespace RenderTest.Drawing
 				return false;
 			}
 
-			camera = new Camera {Position = new Vector3(0f, 0f, -10f)};
+			camera = new Camera {Position = new Vector3(0f, 0f, -2.5f)};
 
 			model = new Model();
 			if(!model.Initialize(directXDevice.Device))

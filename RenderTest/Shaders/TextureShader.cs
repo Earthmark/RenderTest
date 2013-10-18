@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using RenderTest.Drawing;
+using RenderTest.Textures;
 using SharpDX;
 using SharpDX.D3DCompiler;
 using SharpDX.Direct3D11;
@@ -12,11 +13,14 @@ namespace RenderTest.Shaders
 	{
 		#region Fields
 
+		private SamplerState pixelSampler;
 		private PixelShader pixelShader;
 		private VertexShader vertexShader;
 
 		private Buffer matrixBuffer;
 		private InputLayout layout;
+
+		private Texture texture;
 
 		#endregion
 
@@ -40,10 +44,27 @@ namespace RenderTest.Shaders
 
 				using (var bytecode = ShaderBytecode.CompileFromFile("Shaders/Texture.ps", "TexturePixelShader", "ps_4_0"))
 				{
+
 					pixelShader = new PixelShader(device, bytecode) { DebugName = "Texture pixel shader" };
 				}
 
-				return true;
+				var samplerDesc = new SamplerStateDescription
+				{
+					AddressU = TextureAddressMode.Wrap,
+					AddressV = TextureAddressMode.Wrap,
+					AddressW = TextureAddressMode.Wrap,
+					Filter = Filter.ComparisonMinMagMipLinear,
+					MaximumAnisotropy = 1,
+					MipLodBias = 0f,
+					MinimumLod = 0,
+					MaximumLod = float.MaxValue,
+					BorderColor = Color.LimeGreen,
+					ComparisonFunction = Comparison.Always
+				};
+				pixelSampler = new SamplerState(device, samplerDesc);
+				
+				texture = new Texture();
+				return texture.Initialize(device, "Textures/dirt.dds");
 			}
 			catch (Exception e)
 			{
@@ -70,6 +91,7 @@ namespace RenderTest.Shaders
 		{
 			if(pixelShader.SafeDispose()) pixelShader = null;
 			if(vertexShader.SafeDispose()) vertexShader = null;
+			if(texture.SafeDispose()) texture = null;
 			if(matrixBuffer.SafeDispose()) matrixBuffer = null;
 			if(layout.SafeDispose()) layout = null;
 		}
@@ -127,9 +149,11 @@ namespace RenderTest.Shaders
 				context.UnmapSubresource(matrixBuffer, 0);
 
 				context.VertexShader.SetConstantBuffer(0, matrixBuffer);
+				context.PixelShader.SetSampler(0, pixelSampler);
+				context.PixelShader.SetShaderResource(0, texture.Resource);
 
 				context.InputAssembler.InputLayout = layout;
-
+				
 				return true;
 			}
 			catch(Exception)

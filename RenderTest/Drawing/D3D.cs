@@ -139,7 +139,7 @@ namespace RenderTest.Drawing
 				// Create the swap chain, Direct3D device, and Direct3D device context.
 				Device device;
 				SwapChain swapChain;
-				Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.None, swapChainDesc, out device, out swapChain);
+				Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.None, new[]{FeatureLevel.Level_10_0}, swapChainDesc, out device, out swapChain);
 
 				Device = device;
 				SwapChain = swapChain;

@@ -5,7 +5,7 @@ float4x4 Projection;
 struct VertexInputType
 {
 	float4 position : POSITION;
-	float2 tex : TEXCOORD0;
+	float2 tex : TEXCOORD;
 };
 
 struct PixelInputType
@@ -18,7 +18,7 @@ PixelInputType TextureVertexShader(VertexInputType input)
 {
 	PixelInputType output;
 
-	input.position.w = 0.0f;
+	input.position.w = 1.0f;
 	output.position = mul(input.position, World);
 	output.position = mul(output.position, View);
 	output.position = mul(output.position, Projection);

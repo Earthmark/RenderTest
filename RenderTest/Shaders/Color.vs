@@ -1,6 +1,6 @@
-﻿float4x4 worldMatrix;
-float4x4 viewMatrix;
-float4x4 projectionMatrix;
+﻿float4x4 World;
+float4x4 View;
+float4x4 Projection;
 
 struct VertexInputType
 {
@@ -20,9 +20,9 @@ PixelInputType ColorVertexShader(VertexInputType input)
 
 	input.position.w = 1.0f;
 
-	output.position = mul(input.position, worldMatrix);
-	output.position = mul(output.position, viewMatrix);
-	output.position = mul(output.position, projectionMatrix);
+	output.position = mul(input.position, World);
+	output.position = mul(output.position, View);
+	output.position = mul(output.position, Projection);
 
 	output.color = input.color;
 

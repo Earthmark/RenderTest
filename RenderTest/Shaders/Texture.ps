@@ -10,6 +10,6 @@ struct PixelInputType
 float4 TexturePixelShader(PixelInputType input) : SV_TARGET
 {
 	float4 color;
-	color = sampleTexture.sample(sampleType, input.tex);
+	color = sampleTexture.Sample(sampleType, input.tex);
 	return color;
 }

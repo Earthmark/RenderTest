@@ -105,7 +105,7 @@ namespace RenderTest.Drawing
 				vertices[0].Tex = new Vector2(0f, 1f);
 
 				vertices[1].Position = new Vector4(0f, 1f, 0f, 0f); // Top middle.
-				vertices[1].Tex = new Vector2(0f, 0.5f);
+				vertices[1].Tex = new Vector2(0.5f, 0f);
 
 				vertices[2].Position = new Vector4(1f, -1f, 0f, 0f); // Bottom right.
 				vertices[2].Tex = new Vector2(1f, 1f);

@@ -116,12 +116,12 @@ namespace RenderTest.Shaders
 				world.Transpose();
 				view.Transpose();
 				projection.Transpose();
-				
+
 				context.VertexShader.Set(vertexShader);
 				context.PixelShader.Set(pixelShader);
 
 				DataStream mappedResource;
-				context.MapSubresource(matrixBuffer, MapMode.WriteDiscard, MapFlags.None, out mappedResource);
+				context.MapSubresource(matrixBuffer, 0, MapMode.WriteDiscard, MapFlags.None, out mappedResource);
 				
 				mappedResource.Write(world);
 				mappedResource.Write(view);
@@ -129,7 +129,7 @@ namespace RenderTest.Shaders
 				
 				context.UnmapSubresource(matrixBuffer, 0);
 
-				context.VertexShader.SetConstantBuffer(0, matrixBuffer);
+				context.VertexShader.SetConstantBuffers(0, matrixBuffer);
 
 				context.InputAssembler.InputLayout = layout;
 
